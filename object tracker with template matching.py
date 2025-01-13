@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-
 def extract_features(frame):
     orb = cv2.ORB_create()
     keypoints, descriptors = orb.detectAndCompute(frame, None)
@@ -67,8 +66,8 @@ lk_params = dict(winSize = (15, 15),
 
 color = np.random.randint(0, 255, (100, 3))
 
-file_path = 'dataset\\test_data\\dataset(2).mp4'
-folder_path = 'dataset\\test_data'
+file_path = '' # input file path
+folder_path = '' # output folder path
 
 cap = cv2.VideoCapture(file_path)
 ret, first_frame = cap.read()
@@ -77,9 +76,9 @@ frame_h, frame_w, _ = first_frame.shape
 fps = cap.get(cv2.CAP_PROP_FPS)
 
 # define for video saved output
-fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+fourcc = cv2.VideoWriter_fourcc(*'X264')
 filename = file_path.split("\\")
-save_path = os.path.join(folder_path, f"2_normal_{filename[2]}")
+save_path = os.path.join(folder_path, f"blind_{filename[3]}")
 out = cv2.VideoWriter(save_path, fourcc, fps, (frame_w, frame_h))
 
 prev_frame = first_frame
@@ -108,9 +107,8 @@ template_matches = cv2.drawMatches(template, kp1, first_frame, kp2, matches[:10]
 
 # initialize mask
 mask = np.zeros_like(prev_frame)
-mask_size = 360
-
-min_kp =  5
+mask_size = 330
+min_kp =  10
 
 
 while cap.isOpened():
@@ -144,7 +142,7 @@ while cap.isOpened():
 
         p0 =  matches_kp[:10].reshape(-1, 1, 2)
 
-        mask_size = 400
+        mask_size = 450
 
         continue
         
@@ -153,6 +151,7 @@ while cap.isOpened():
         good_old = p0[st==1]
 
         x_coords = [pt[0] for pt in good_new]
+
         avg_x = int(np.mean(x_coords))
 
         x_start = max(int(avg_x - mask_size//2), 0)
